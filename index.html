@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="了解孩子">
+<title>了解孩子的個性 — 三天觀察練習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-dark:  #085041;
+    --teal-mid:   #0F6E56;
+    --teal-light: #E1F5EE;
+    --teal-pale:  #f0faf6;
+    --gray-dark:  #2C2C2A;
+    --gray-mid:   #5F5E5A;
+    --gray-light: #F1EFE8;
+    --gray-pale:  #fafaf8;
+    --border:     #D3D1C7;
+    --white:      #ffffff;
+    --radius:     14px;
+    --radius-sm:  8px;
+    --shadow:     0 2px 12px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 16px; }
+  body {
+    font-family: "Noto Sans TC", sans-serif;
+    background: var(--gray-pale);
+    color: var(--gray-dark);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--teal-dark);
+    color: white;
+    padding: 20px 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; }
+  .header p  { font-size: 12px; opacity: 0.75; }
+  .day-pills {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .day-pill {
+    flex: 1;
+    padding: 7px 0;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.6);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .day-pill.active {
+    background: white;
+    color: var(--teal-dark);
+    border-color: white;
+    font-weight: 700;
+  }
+  .day-pill.done {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border-color: rgba(255,255,255,0.5);
+  }
+  .day-pill.done::after { content: " ✓"; }
+
+  /* Main */
+  .main { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--teal-mid);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .card-q {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .card-hint {
+    font-size: 12px;
+    color: var(--gray-mid);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    background: var(--gray-pale);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--border);
+  }
+
+  /* Options */
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: white;
+  }
+  .opt:last-child { margin-bottom: 0; }
+  .opt:active { transform: scale(0.98); }
+  .opt.selected {
+    background: var(--teal-light);
+    border-color: var(--teal-mid);
+  }
+  .opt-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+  .opt.selected .opt-radio {
+    border-color: var(--teal-mid);
+    background: var(--teal-mid);
+  }
+  .opt-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: white;
+    display: none;
+  }
+  .opt.selected .opt-dot { display: block; }
+  .opt-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--gray-dark);
+  }
+  .opt.selected .opt-text { color: var(--teal-dark); font-weight: 500; }
+
+  /* Textarea */
+  .note-label { font-size: 13px; font-weight: 700; color: var(--gray-dark); margin-bottom: 8px; }
+  .note-hint  { font-size: 12px; color: var(--gray-mid); margin-bottom: 10px; }
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 14px;
+    font-family: "Noto Sans TC", sans-serif;
+    color: var(--gray-dark);
+    background: var(--gray-pale);
+    resize: none;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { outline: none; border-color: var(--teal-mid); background: white; }
+  textarea::placeholder { color: #aaa; }
+
+  /* Save button */
+  .btn-save {
+    width: 100%;
+    padding: 14px;
+    margin-top: 4px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--gray-dark);
+    font-size: 15px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-save:active { background: var(--gray-light); }
+  .btn-save.saved {
+    background: var(--teal-light);
+    border-color: var(--teal-mid);
+    color: var(--teal-dark);
+  }
+
+  /* Result btn */
+  .btn-result {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--teal-dark);
+    color: white;
+    font-size: 16px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.03em;
+  }
+  .btn-result:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* Panel visibility */
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* Result panel */
+  #result-panel { display: none; padding: 16px; max-width: 480px; margin: 0 auto; }
+  #result-panel.show { display: block; }
+
+  .result-hero {
+    background: var(--teal-dark);
+    color: white;
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .result-type {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    margin-bottom: 4px;
+  }
+  .result-name { font-size: 18px; font-weight: 500; opacity: 0.85; margin-bottom: 14px; }
+  .result-desc { font-size: 14px; line-height: 1.7; opacity: 0.9; text-align: left; }
+
+  .dim-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .dim-title { font-size: 13px; font-weight: 700; color: var(--gray-mid); margin-bottom: 12px; letter-spacing: 0.05em; }
+  .dim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .dim-row:last-child { margin-bottom: 0; }
+  .dim-lbl { font-size: 13px; font-weight: 700; color: var(--teal-dark); width: 24px; text-align: center; }
+  .dim-lbl.muted { color: var(--border); font-weight: 400; }
+  .dim-bar { flex: 1; height: 10px; background: var(--gray-light); border-radius: 5px; overflow: hidden; }
+  .dim-fill { height: 100%; background: var(--teal-mid); border-radius: 5px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+  .dim-pct { font-size: 12px; color: var(--teal-mid); font-weight: 700; width: 36px; text-align: right; }
+
+  .tips-section {
+    background: var(--teal-pale);
+    border: 1px solid var(--teal-light);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .tips-title { font-size: 13px; font-weight: 700; color: var(--teal-dark); margin-bottom: 12px; }
+  .tip-item {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-dark);
+    padding: 10px 12px;
+    background: white;
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    border-left: 3px solid var(--teal-mid);
+  }
+  .tip-item:last-child { margin-bottom: 0; }
+
+  /* Share buttons */
+  .share-section { margin-bottom: 12px; }
+  .btn-line {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: #06C755;
+    color: white;
+    font-size: 16px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    transition: all 0.18s;
+  }
+  .btn-line:active { opacity: 0.85; transform: scale(0.98); }
+  .btn-line svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+  .btn-copy {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--gray-dark);
+    font-size: 15px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 10px;
+  }
+  .btn-copy:active { background: var(--gray-light); }
+  .btn-copy.copied { background: var(--teal-light); border-color: var(--teal-mid); color: var(--teal-dark); }
+
+  .btn-reset {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: var(--gray-mid);
+    font-size: 13px;
+    font-family: "Noto Sans TC", sans-serif;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--gray-dark);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Progress dots in header */
+  .progress-dots { display: flex; gap: 5px; }
+  .prog-dot { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.3); transition: all 0.3s; }
+  .prog-dot.filled { background: white; width: 18px; }
+</style>
+</head>
+<body>
+
+<div class="header" id="main-header">
+  <div class="header-top">
+    <div>
+      <h1>了解孩子的個性</h1>
+      <p>三天觀察練習 — 羽升幸福養成學苑</p>
+    </div>
+    <div class="progress-dots">
+      <div class="prog-dot" id="pd0"></div>
+      <div class="prog-dot" id="pd1"></div>
+      <div class="prog-dot" id="pd2"></div>
+    </div>
+  </div>
+  <div class="day-pills">
+    <button class="day-pill active" id="tab0" onclick="switchDay(0)">第一天</button>
+    <button class="day-pill" id="tab1" onclick="switchDay(1)">第二天</button>
+    <button class="day-pill" id="tab2" onclick="switchDay(2)">第三天</button>
+  </div>
+</div>
+
+<div id="main-content">
+
+<!-- 第一天 -->
+<div class="main day-panel active" id="day0">
+
+  <div class="card">
+    <div class="card-label">觀察重點 1 — 能量來源</div>
+    <div class="card-q">今天放學／放假回到家，孩子第一件事是什麼？</div>
+    <div class="card-hint">觀察他「充電」的方式，是需要獨處還是需要人陪</div>
+    <div onclick="choose(this,0,0,'E')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">馬上找人說話、開電視、找兄弟姊妹或你聊今天的事</div>
+    </div>
+    <div onclick="choose(this,0,0,'I')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">先回房間、安靜待一下、需要一段獨處時間再出來</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">觀察重點 2 — 資訊接收</div>
+    <div class="card-q">孩子在學一件新事物時，比較喜歡哪種方式？</div>
+    <div class="card-hint">注意他是否需要步驟說明，還是喜歡自己摸索大方向</div>
+    <div onclick="choose(this,0,1,'S')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">喜歡一步一步說清楚、給具體範例、按順序來</div>
+    </div>
+    <div onclick="choose(this,0,1,'N')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">不喜歡照步驟、喜歡先看全局、自己發現規律</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="note-label">今天的觀察筆記</div>
+    <div class="note-hint">寫下今天最讓你印象深刻的一個孩子行為或反應，不需要分析，記下來就好</div>
+    <textarea id="note0" rows="4" placeholder="例如：今天他被老師稱讚了，回家沒有主動說，等我問才說……"></textarea>
+  </div>
+
+  <button class="btn-save" id="save0" onclick="saveDay(0)">儲存第一天的觀察</button>
+</div>
+
+<!-- 第二天 -->
+<div class="main day-panel" id="day1">
+
+  <div class="card">
+    <div class="card-label">觀察重點 1 — 決策方式</div>
+    <div class="card-q">當孩子需要做選擇時，他通常怎麼決定？</div>
+    <div class="card-hint">觀察他是靠「感覺對不對」還是靠「講道理」</div>
+    <div onclick="choose(this,1,0,'T')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">會列原因、問「哪個比較好」、用邏輯分析，在乎是否合理</div>
+    </div>
+    <div onclick="choose(this,1,0,'F')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">看「感覺」、在乎別人怎麼看、容易被情緒影響決定</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">觀察重點 2 — 生活風格</div>
+    <div class="card-q">孩子對規則、時間表、計畫的態度是？</div>
+    <div class="card-hint">觀察他是喜歡有結構，還是抗拒被安排</div>
+    <div onclick="choose(this,1,1,'J')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">喜歡知道接下來要做什麼、不喜歡臨時改變計畫</div>
+    </div>
+    <div onclick="choose(this,1,1,'P')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">抗拒固定行程、喜歡彈性、容易拖延但在最後關頭爆發</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="note-label">今天的觀察筆記</div>
+    <div class="note-hint">今天孩子在面對衝突或不順心的事，怎麼反應？</div>
+    <textarea id="note1" rows="4" placeholder="例如：今天弟弟弄壞他的東西，他先發火然後自己去房間冷靜，過了半小時出來就沒事了……"></textarea>
+  </div>
+
+  <button class="btn-save" id="save1" onclick="saveDay(1)">儲存第二天的觀察</button>
+</div>
+
+<!-- 第三天 -->
+<div class="main day-panel" id="day2">
+
+  <div class="card">
+    <div class="card-label">觀察重點 1 — 社交偏好</div>
+    <div class="card-q">孩子和朋友相處時，更像哪一種？</div>
+    <div class="card-hint">觀察他的交友模式，是廣泛還是深度</div>
+    <div onclick="choose(this,2,0,'E2')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">朋友多、喜歡群體活動、認識新朋友不緊張</div>
+    </div>
+    <div onclick="choose(this,2,0,'I2')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">朋友少但深交、不喜歡大場合、寧可和一兩個人深聊</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">觀察重點 2 — 溝通風格</div>
+    <div class="card-q">你跟孩子分享一件事，他通常怎麼回應？</div>
+    <div class="card-hint">觀察他是先給感受還是先給想法</div>
+    <div onclick="choose(this,2,1,'F2')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">先問「你還好嗎」、先安慰、情感優先</div>
+    </div>
+    <div onclick="choose(this,2,1,'T2')" class="opt">
+      <div class="opt-radio"><div class="opt-dot"></div></div>
+      <div class="opt-text">先問「然後呢」「那你怎麼做」、直接給建議或想解決方案</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="note-label">三天總結</div>
+    <div class="note-hint">這三天下來，你對孩子有什麼新發現或「原來如此」的感受？</div>
+    <textarea id="note2" rows="4" placeholder="例如：我以前以為他很外向，但這三天觀察下來，他其實更喜歡獨處……"></textarea>
+  </div>
+
+  <button class="btn-result" onclick="showResult()">查看孩子的個性結果 →</button>
+</div>
+
+</div><!-- /main-content -->
+
+<!-- 結果頁 -->
+<div id="result-panel">
+  <div class="result-hero">
+    <div class="result-type" id="r-type">INFP</div>
+    <div class="result-name" id="r-name">調停者</div>
+    <div class="result-desc" id="r-desc"></div>
+  </div>
+
+  <div class="dim-section">
+    <div class="dim-title">四個面向的觀察傾向</div>
+    <div id="r-dims"></div>
+  </div>
+
+  <div class="tips-section">
+    <div class="tips-title">和孩子相處的建議</div>
+    <div id="r-tips"></div>
+  </div>
+
+  <div class="share-section">
+    <button class="btn-line" onclick="shareToLine()">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      分享到 LINE 群組
+    </button>
+    <button class="btn-copy" id="copy-btn" onclick="copyResult()">複製結果文字</button>
+    <button class="btn-reset" onclick="confirmReset()">重新觀察（清除資料）</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'yuSheng_mbti_v1';
+
+const mbtiData = {
+  INTJ:{name:'建築師',desc:'獨立思考、目標明確、不愛說廢話。孩子看起來冷靜，其實內心有很多想法，需要空間和尊重。',tips:['給他安靜思考的空間，不要一直催他說話','解釋規定的「理由」，他不接受沒道理的要求','稱讚他的思考和判斷，而不只是成果']},
+  INTP:{name:'邏輯學家',desc:'好奇心強、喜歡追根究柢、對邏輯不通的事很敏感。和他講道理比講感情有效。',tips:['讓他問「為什麼」，不要說「就是這樣」','他的不整齊是思考狀態，不一定是懶惰','尊重他的興趣深度，不要說「夠了夠了」']},
+  ENTJ:{name:'指揮官',desc:'有主見、喜歡帶領、不喜歡被管太多。這類孩子需要的是「談判」而非「命令」。',tips:['讓他在家有可以負責的事','和他討論規則，而不是直接宣布','他的強勢是能力，引導而非壓制']},
+  ENTP:{name:'辯論家',desc:'點子多、喜歡挑戰規則、口才好。看起來在搗蛋，其實在測試界線和尋找刺激。',tips:['和他辯論，而不是叫他閉嘴','給他有創意的挑戰和出口','設定規則要說理由，他會接受合理的限制']},
+  INFJ:{name:'提倡者',desc:'敏感、有同理心、喜歡幫助別人。這類孩子常把別人的感受放第一，容易忽略自己。',tips:['定期問他「你還好嗎」，不只問功課','讓他知道他的感受很重要','鼓勵他說出自己的需求，不要只顧別人']},
+  INFP:{name:'調停者',desc:'有自己的內心世界、在乎價值觀和意義、不喜歡被強迫。表面平靜，內心感受很豐富。',tips:['不要用比較的方式激勵他','讓他用自己的方式表達（寫作、畫畫等）','接納他的「慢熱」，他需要時間才能打開']},
+  ENFJ:{name:'主角',desc:'熱情、善於溝通、在乎人際關係。這類孩子在群體中如魚得水，但也容易太在意別人的評價。',tips:['讓他知道你以他為傲，不只是成績','幫助他練習說「不」，不要每件事都攬','鼓勵他也照顧自己的感受']},
+  ENFP:{name:'競選者',desc:'充滿熱情、創意豐富、容易對新事物著迷。但也容易三分鐘熱度，需要幫助他收斂。',tips:['支持他的熱情，不要一開始就潑冷水','幫他把大夢想拆成小步驟','允許他改變興趣，但鼓勵他完成承諾的事']},
+  ISTJ:{name:'物流師',desc:'負責任、有條理、喜歡規則和可預期的環境。這類孩子表面嚴肅，其實很忠心可靠。',tips:['提前告知行程變動，不要突然改計畫','讚美他的負責任和可靠','讓他知道犯錯是可以的，不用太嚴格對自己']},
+  ISFJ:{name:'守衛者',desc:'溫和、細心、默默付出。這類孩子常常看顧別人，但自己的需求說不出口。',tips:['主動問他今天怎麼樣，不要等他說','讓他知道你有注意到他為家裡做的事','鼓勵他說出自己的喜好和需求']},
+  ESTJ:{name:'總經理',desc:'實際、重效率、喜歡掌控。這類孩子對不守規矩的人很沒耐心，在群體中常是小領袖。',tips:['給他負責任的機會，他需要成就感','解釋規定的目的，不只是「叫你做你就做」','幫助他理解別人的步調和感受也很重要']},
+  ESFJ:{name:'執政官',desc:'熱心、在乎群體和諧、喜歡照顧別人。這類孩子需要被肯定，很在意別人怎麼看他。',tips:['讚美要具體：說「你今天幫弟弟那件事做得很好」','不要在人前批評他，他對公開指責很敏感','讓他知道他不需要每個人都喜歡他']},
+  ISTP:{name:'鑑賞家',desc:'冷靜、動手能力強、喜歡自己解決問題。不太喜歡情感表達，但行動是他的愛的語言。',tips:['讓他用手做事（拆裝、修理、實驗）','不要強迫他說感受，觀察他的行動就好','他沉默不代表有問題，給他空間']},
+  ISFP:{name:'探險家',desc:'溫和、有藝術感、活在當下。這類孩子不喜歡計畫太遠，喜歡用自己的方式表達。',tips:['讓他選擇自己喜歡的表達方式','不要用未來恐嚇他（「你這樣以後怎麼辦」）','欣賞他細膩的感受力，那是天賦']},
+  ESTP:{name:'企業家',desc:'行動派、喜歡刺激、活在當下很快樂。這類孩子坐不住，需要身體活動和挑戰。',tips:['讓他有足夠的體能活動出口','用短期目標取代長期規劃，他對「現在」最有感','不要只說理，讓他從做中學']},
+  ESFP:{name:'表演者',desc:'開朗、喜歡玩、天生的歡樂製造機。這類孩子對美感和人際非常敏感，需要歡樂的環境。',tips:['讓生活有一些有趣的儀式感','他的喜歡熱鬧不是壞事，找到健康的出口','在輕鬆的氣氛下說正事，效果最好']}
+};
+
+// State
+let answers = [[null,null],[null,null],[null,null]];
+let notes   = ['','',''];
+let currentDay = 0;
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    answers = data.answers || answers;
+    notes   = data.notes   || notes;
+    // Restore UI
+    for (let d = 0; d < 3; d++) {
+      if (notes[d]) {
+        const ta = document.getElementById('note'+d);
+        if (ta) ta.value = notes[d];
+      }
+      for (let q = 0; q < 2; q++) {
+        if (answers[d][q]) {
+          const opts = document.querySelectorAll('#day'+d+' .opt');
+          opts.forEach(o => {
+            if (o.getAttribute('onclick').includes("'"+answers[d][q]+"'")) {
+              o.classList.add('selected');
+            }
+          });
+        }
+      }
+      updateTabState(d);
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ answers, notes }));
+  } catch(e) {}
+}
+
+function updateTabState(d) {
+  const hasAns = answers[d].some(a => a !== null);
+  const hasNote = notes[d] && notes[d].trim().length > 0;
+  const tab = document.getElementById('tab'+d);
+  const dot = document.getElementById('pd'+d);
+  if (hasAns || hasNote) {
+    tab.classList.add('done');
+    dot.classList.add('filled');
+  }
+}
+
+function choose(el, day, q, val) {
+  const parent = el.closest('.card') || el.parentElement;
+  parent.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[day][q] = val;
+  saveState();
+}
+
+function saveDay(day) {
+  notes[day] = document.getElementById('note'+day).value;
+  saveState();
+  updateTabState(day);
+  const btn = document.getElementById('save'+day);
+  btn.textContent = '已儲存';
+  btn.classList.add('saved');
+  showToast('第'+(day+1)+'天的觀察已儲存！');
+  setTimeout(() => {
+    btn.textContent = '儲存第'+(day+1)+'天的觀察';
+    btn.classList.remove('saved');
+  }, 2500);
+}
+
+function switchDay(day) {
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.day-pill').forEach(t => t.classList.remove('active'));
+  document.getElementById('day'+day).classList.add('active');
+  document.getElementById('tab'+day).classList.add('active');
+  currentDay = day;
+}
+
+function showResult() {
+  notes[2] = document.getElementById('note2').value;
+  saveState();
+
+  const EI = {E:0,I:0}, SN = {S:0,N:0}, TF = {T:0,F:0}, JP = {J:0,P:0};
+
+  const a = answers;
+  if(a[0][0]==='E') EI.E+=2; else if(a[0][0]==='I') EI.I+=2;
+  if(a[0][1]==='S') SN.S+=2; else if(a[0][1]==='N') SN.N+=2;
+  if(a[1][0]==='T') TF.T+=2; else if(a[1][0]==='F') TF.F+=2;
+  if(a[1][1]==='J') JP.J+=2; else if(a[1][1]==='P') JP.P+=2;
+  if(a[2][0]==='E2') EI.E+=1; else if(a[2][0]==='I2') EI.I+=1;
+  if(a[2][1]==='F2') TF.F+=1; else if(a[2][1]==='T2') TF.T+=1;
+
+  const ei = EI.E >= EI.I ? 'E' : 'I';
+  const sn = SN.S >= SN.N ? 'S' : 'N';
+  const tf = TF.T >= TF.F ? 'T' : 'F';
+  const jp = JP.J >= JP.P ? 'J' : 'P';
+  const type = ei+sn+tf+jp;
+
+  const EI_t = EI.E+EI.I||1, SN_t = SN.S+SN.N||1, TF_t = TF.T+TF.F||1, JP_t = JP.J+JP.P||1;
+  const EI_p = Math.round(EI[ei]/EI_t*100);
+  const SN_p = Math.round(SN[sn]/SN_t*100);
+  const TF_p = Math.round(TF[tf]/TF_t*100);
+  const JP_p = Math.round(JP[jp]/JP_t*100);
+
+  const info = mbtiData[type] || {name:'探索中',desc:'繼續觀察，每個孩子都是獨一無二的。',tips:['多和孩子聊聊','觀察他在不同情境的反應']};
+
+  document.getElementById('r-type').textContent = type;
+  document.getElementById('r-name').textContent = info.name;
+  document.getElementById('r-desc').textContent = info.desc;
+
+  document.getElementById('r-dims').innerHTML =
+    dimRow(ei,'E','I',EI_p) + dimRow(sn,'S','N',SN_p) +
+    dimRow(tf,'T','F',TF_p) + dimRow(jp,'J','P',JP_p);
+
+  document.getElementById('r-tips').innerHTML =
+    info.tips.map(t => `<div class="tip-item">${t}</div>`).join('');
+
+  window._result = { type, name: info.name };
+
+  document.getElementById('main-header').style.display = 'none';
+  document.getElementById('main-content').style.display = 'none';
+  const rp = document.getElementById('result-panel');
+  rp.classList.add('show');
+  window.scrollTo(0,0);
+}
+
+function dimRow(winner, lA, lB, pct) {
+  return `<div class="dim-row">
+    <span class="dim-lbl${winner===lA?'':' muted'}">${lA}</span>
+    <div class="dim-bar"><div class="dim-fill" style="width:${pct}%"></div></div>
+    <span class="dim-lbl${winner===lB?'':' muted'}">${lB}</span>
+    <span class="dim-pct">${pct}%</span>
+  </div>`;
+}
+
+function buildShareText() {
+  const r = window._result || {};
+  return `【三天觀察練習結果】\n\n我孩子的個性類型是：${r.type}（${r.name}）\n\n觀察練習來自羽升幸福養成學苑讀書會\n你的孩子是什麼類型呢？`;
+}
+
+function shareToLine() {
+  const text = encodeURIComponent(buildShareText());
+  window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=${text}`, '_blank');
+}
+
+function copyResult() {
+  const text = buildShareText();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '已複製！貼到 LINE 群組吧';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '複製結果文字'; btn.classList.remove('copied'); }, 3000);
+    });
+  } else {
+    showToast('請長按選取文字複製');
+  }
+}
+
+function confirmReset() {
+  if (confirm('確定要清除所有觀察記錄，重新開始嗎？')) resetAll();
+}
+
+function resetAll() {
+  answers = [[null,null],[null,null],[null,null]];
+  notes   = ['','',''];
+  localStorage.removeItem(STORE_KEY);
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('textarea').forEach(t => t.value = '');
+  document.querySelectorAll('.day-pill').forEach((t,i) => {
+    t.classList.remove('done','active');
+    if(i===0) t.classList.add('active');
+  });
+  document.querySelectorAll('.prog-dot').forEach(d => d.classList.remove('filled'));
+  document.getElementById('main-header').style.display = '';
+  document.getElementById('main-content').style.display = '';
+  document.getElementById('result-panel').classList.remove('show');
+  switchDay(0);
+  window.scrollTo(0,0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+loadState();
+</script>
+</body>
+</html>
