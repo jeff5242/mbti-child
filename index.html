@@ -244,6 +244,16 @@
     margin-bottom: 12px;
     text-align: center;
   }
+  .result-animal {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.3);
+    margin: 0 auto 16px;
+    display: block;
+    background: rgba(255,255,255,0.1);
+  }
   .result-type {
     font-size: 44px;
     font-weight: 700;
@@ -513,6 +523,7 @@
 <!-- 結果頁 -->
 <div id="result-panel">
   <div class="result-hero">
+    <img class="result-animal" id="r-animal" src="" alt="" onerror="this.style.display='none'"/>
     <div class="result-type" id="r-type">INFP</div>
     <div class="result-name" id="r-name">調停者</div>
     <div class="result-desc" id="r-desc"></div>
@@ -674,6 +685,10 @@ function showResult() {
   document.getElementById('r-type').textContent = type;
   document.getElementById('r-name').textContent = info.name;
   document.getElementById('r-desc').textContent = info.desc;
+  const animalImg = document.getElementById('r-animal');
+  animalImg.src = type + '.png';
+  animalImg.alt = info.name;
+  animalImg.style.display = 'block';
 
   document.getElementById('r-dims').innerHTML =
     dimRow(ei,'E','I',EI_p) + dimRow(sn,'S','N',SN_p) +
